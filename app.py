@@ -2,41 +2,75 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
-st.set_page_config(page_title="CSV Viewer", layout="wide")
+# --------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------
+st.set_page_config(
+    page_title="CSV Viewer",
+    layout="wide"
+)
 
-# 🔥 Custom CSS for bigger fonts
+# --------------------------------------------------
+# CUSTOM CSS (BIGGER, ATTENTION-GRABBING FONTS)
+# --------------------------------------------------
 st.markdown(
     """
     <style>
-    /* Main app font */
     html, body, [class*="css"] {
         font-size: 18px;
     }
 
-    /* Dataframe header */
+    h1 {
+        font-size: 42px !important;
+        font-weight: 800 !important;
+    }
+
     thead th {
         font-size: 20px !important;
         font-weight: 700 !important;
     }
 
-    /* Dataframe cells */
     tbody td {
         font-size: 18px !important;
         padding: 10px !important;
-    }
-
-    /* Title */
-    h1 {
-        font-size: 42px !important;
-        font-weight: 800 !important;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-st.title("📊 CSV File Viewer")
+# --------------------------------------------------
+# SIMPLE IN-APP VIEW COUNTER
+# --------------------------------------------------
+VIEW_FILE = "views.txt"
 
+def get_views():
+    if not Path(VIEW_FILE).exists():
+        Path(VIEW_FILE).write_text("0")
+    return int(Path(VIEW_FILE).read_text())
+
+def increment_views():
+    views = get_views() + 1
+    Path(VIEW_FILE).write_text(str(views))
+    return views
+
+if "viewed" not in st.session_state:
+    st.session_state.viewed = True
+    total_views = increment_views()
+else:
+    total_views = get_views()
+
+# --------------------------------------------------
+# APP UI
+# --------------------------------------------------
+st.title("📊 CSV File Viewer")
+st.caption(f"👀 Total App Views: {total_views}")
+
+st.write("This table displays the CSV file located in the same directory as the app.")
+
+# --------------------------------------------------
+# LOAD CSV (SAME DIRECTORY)
+# --------------------------------------------------
 CSV_FILE = "sample.csv"
 
 if Path(CSV_FILE).exists():
